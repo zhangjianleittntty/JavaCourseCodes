@@ -32,6 +32,11 @@ import static io.netty.handler.codec.http.HttpResponseStatus.NO_CONTENT;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static io.netty.handler.codec.http.HttpVersion.HTTP_1_1;
 
+/**
+ * httpClient实现OutBoundHandler
+ * @date 2021-01-02
+ * @author zhangjl
+ */
 public class HttpOutboundHandler {
     
     private CloseableHttpAsyncClient httpclient;
@@ -49,13 +54,15 @@ public class HttpOutboundHandler {
         long keepAliveTime = 1000;
         int queueSize = 2048;
         RejectedExecutionHandler handler = new ThreadPoolExecutor.CallerRunsPolicy();//.DiscardPolicy();
+
+        // 线程池异步执行httpClient响应
         proxyService = new ThreadPoolExecutor(cores, cores,
                 keepAliveTime, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(queueSize),
                 new NamedThreadFactory("proxyService"), handler);
         
         IOReactorConfig ioConfig = IOReactorConfig.custom()
-                .setConnectTimeout(1000)
-                .setSoTimeout(1000)
+                .setConnectTimeout(5000)
+                .setSoTimeout(5000)
                 .setIoThreadCount(cores)
                 .setRcvBufSize(32 * 1024)
                 .build();
@@ -73,9 +80,9 @@ public class HttpOutboundHandler {
     }
     
     public void handle(final FullHttpRequest fullRequest, final ChannelHandlerContext ctx, HttpRequestFilter filter) {
-        String backendUrl = router.route(this.backendUrls);
-        final String url = backendUrl + fullRequest.uri();
-        filter.filter(fullRequest, ctx);
+        String backendUrl = router.route(this.backendUrls);     // 获取路由地址
+        final String url = backendUrl + fullRequest.uri();      // 组装URL
+        filter.filter(fullRequest, ctx);                        // 过滤器执行
         proxyService.submit(()->fetchGet(fullRequest, ctx, url));
     }
     
@@ -83,7 +90,7 @@ public class HttpOutboundHandler {
         final HttpGet httpGet = new HttpGet(url);
         //httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_CLOSE);
         httpGet.setHeader(HTTP.CONN_DIRECTIVE, HTTP.CONN_KEEP_ALIVE);
-        httpGet.setHeader("mao", inbound.headers().get("mao"));
+        httpGet.setHeader("zhangjl", inbound.headers().get("requestHeader"));
 
         httpclient.execute(httpGet, new FutureCallback<HttpResponse>() {
             @Override

@@ -12,6 +12,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * Netty执行handler
+ * @author zhangjl
+ * @date 2021-01-04
+ */
 public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
 
     private static Logger logger = LoggerFactory.getLogger(HttpInboundHandler.class);
@@ -33,7 +38,7 @@ public class HttpInboundHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         try {
             //logger.info("channelRead流量接口请求开始，时间为{}", startTime);
-            FullHttpRequest fullRequest = (FullHttpRequest) msg;
+            FullHttpRequest fullRequest = (FullHttpRequest) msg;          //Request
 //            String uri = fullRequest.uri();
 //            //logger.info("接收到的请求url为{}", uri);
 //            if (uri.contains("/test")) {

@@ -11,6 +11,11 @@ import io.netty.handler.codec.http.HttpServerCodec;
 
 import java.util.List;
 
+/**
+ * 网关初始化
+ * @author zhangjl
+ * @date 2021-01-04
+ */
 public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 	
 	private List<String> proxyServer;
@@ -21,13 +26,13 @@ public class HttpInboundInitializer extends ChannelInitializer<SocketChannel> {
 	
 	@Override
 	public void initChannel(SocketChannel ch) {
-		ChannelPipeline p = ch.pipeline();
+		ChannelPipeline p = ch.pipeline();           //Netty channel
 //		if (sslCtx != null) {
 //			p.addLast(sslCtx.newHandler(ch.alloc()));
 //		}
 		p.addLast(new HttpServerCodec());
 		//p.addLast(new HttpServerExpectContinueHandler());
 		p.addLast(new HttpObjectAggregator(1024 * 1024));
-		p.addLast(new HttpInboundHandler(this.proxyServer));
+		p.addLast(new HttpInboundHandler(this.proxyServer));       //设置执行Handler
 	}
 }

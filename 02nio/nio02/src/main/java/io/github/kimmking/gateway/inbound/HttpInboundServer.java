@@ -16,6 +16,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * 启动Netty的Server网关服务器
+ * @author zhangjl
+ * @date 2021-01-04
+ */
 @Data
 public class HttpInboundServer {
 
